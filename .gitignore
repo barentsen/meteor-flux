@@ -1,0 +1,14 @@
+*.sublime*
+*log*
+
+*.py[cod]
+
+# C extensions
+*.so
+
+# Unit test / coverage reports
+.cache
+.coverage
+.tox
+nosetests.xml
+

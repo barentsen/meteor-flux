@@ -1,0 +1,25 @@
+Format MetRec FLX 1.0
+ObserverFirstName Javor
+ObserverMiddleName 
+ObserverLastName Kac
+ObserverCode KACJA
+ReporterFirstName Javor
+ReporterMiddleName 
+ReporterLastName Kac
+ObservingSiteName Ljubljana
+ObservingSiteCountry Slovenia
+ObservingSiteCode 23130
+ObservingSiteLongitude 14.54097
+ObservingSiteLatitude 46.07490
+ObservingSiteAltitude 303
+CameraName ORION1
+CameraType Mintron 12V6 EX
+CameraNominalLM 3.9
+IntensifierType none
+LensType Computar HG 0808 AFCS
+LensFocalLength 8
+LensFStop 0.8
+FieldOfViewAlt 31.7
+FieldOfViewAz 30.8
+FieldOfViewSquareDeg 1402
+FieldOfViewSquareKm 46035
