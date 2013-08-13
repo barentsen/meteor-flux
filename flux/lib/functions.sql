@@ -97,7 +97,7 @@ $_$;
 CREATE OR REPLACE FUNCTION bin_adaptive(text,
             timestamp without time zone, timestamp without time zone, 
             integer, float, interval, interval, 
-            float, float, float) RETURNS SETOF fluxbin
+            float, float, float, float) RETURNS SETOF fluxbin
 LANGUAGE plpgsql
 AS $_$DECLARE
     myshower ALIAS FOR $1;
@@ -107,9 +107,10 @@ AS $_$DECLARE
     min_eca ALIAS FOR $5;
     min_interval ALIAS FOR $6;
     max_interval ALIAS FOR $7;
-    min_alt ALIAS FOR $8;
-    gamma ALIAS FOR $9;
-    popindex ALIAS FOR $10;
+    min_alt_station ALIAS FOR $8;
+    min_eca_station ALIAS FOR $9;
+    gamma ALIAS FOR $10;
+    popindex ALIAS FOR $11;
     myperiod RECORD;
     total_teff float := 0;
     total_eca float := 0;
@@ -133,8 +134,8 @@ BEGIN
             shower = myshower
             AND time BETWEEN start AND stop
             AND eca IS NOT NULL
-            AND eca > 0.50
-            AND alt > min_alt
+            AND eca > min_eca_station
+            AND alt > min_alt_station
         GROUP BY time
         ORDER BY time) LOOP
                 
@@ -183,7 +184,7 @@ BEGIN
     END LOOP;
 
     -- Last interval
-    IF total_met > 5 THEN
+    IF (total_met > 0.7*min_meteors) OR (total_eca > 0.7*min_eca) THEN
             interval.time := intervalstart + (total_offset / total_eca);
             interval.solarlon := solarlon(interval.time);
             interval.teff := total_teff / 60.0; -- hours
