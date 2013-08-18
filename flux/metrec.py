@@ -121,7 +121,7 @@ class MetRecData(object):
         return out 
 
     def get_json(self):
-        """Returns the flux data in the MetRec file in JSON format.
+        """Returns the flux data in the MetRec file as a list of dicts.
 
         Returns
         -------

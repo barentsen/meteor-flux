@@ -103,6 +103,8 @@ class FluxDB(object):
         # The magnitude array requires special formatting: "{1,2,3}"
         magnitudes = [str(m) for m in json['mag']]
         json['mag'] = '"{' + (','.join(magnitudes)) + '}"'
+        if json['dist'] is None:
+            json['dist'] = ''
         csv = "{dataset_id},{format},{station},{shower},{time},{sollong}," + \
               "{teff},{lmstar},{alt},{dist},{vel},{mlalt},{lmmet},{eca},{met}," + \
               "{mag},{added}"
