@@ -18,8 +18,8 @@ Returns:
 JSON objects with flux data and link to image.
 
 """
-from flux import db
 from flask import Flask, request
+from flux import db, graph
 
 app = Flask(__name__)
 MYDB = db.FluxDB()
@@ -48,34 +48,15 @@ def get_flux():
     gamma = request.args.get('gamma', default=1.5, type=float)
     popindex = request.args.get('popindex', default=2.0, type=float)
 
-    result = MYDB.bin_adaptive(shower, start, stop,
-                               min_interval=min_interval,
-                               max_interval=max_interval,
-                               min_meteors=min_meteors,
-                               min_eca=min_eca,
-                               min_alt=min_alt,
-                               gamma=gamma,
-                               popindex=popindex)
-
-    if result is not None and len(result) > 0:
-        keys = result[0].keys()
-        json = '{"status":"OK", "flux": ['
-        for i, row in enumerate(result):
-            if i > 0:
-                json += ', \n'
-            json += '{'
-            json += '"time":"{0}", '.format(str(row['time'])[0:16])
-            json += '"sollon":{0:.3f}, '.format(row['solarlon'])
-            json += '"teff":{0:.1f}, '.format(row['teff'])
-            json += '"eca":{0:.1f}, '.format(row['eca'])
-            json += '"met":{0}, '.format(row['met'])
-            json += '"flux":{0:.1f}, '.format(row['flux'])
-            json += '"e_flux":{0:.1f}, '.format(row['e_flux'])
-            json += '"zhr":{0:.0f}'.format(row['zhr'])
-            json += '}'
-        json += ']}'
-        return json
-    return '{"status":"ERROR"}'
+    result = graph.VideoFluxProfile(MYDB, shower, start, stop,
+                                   min_interval=min_interval,
+                                   max_interval=max_interval,
+                                   min_meteors=min_meteors,
+                                   min_eca=min_eca,
+                                   min_alt=min_alt,
+                                   gamma=gamma,
+                                   popindex=popindex)
+    return result.get_json()
 
 
 

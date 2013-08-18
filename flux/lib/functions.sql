@@ -1,6 +1,13 @@
+---
+--- PostgreSQL stored procedures to support meteorflux.
+---
+
+---
+--- Date/time helper functions.
+---
 
 CREATE OR REPLACE FUNCTION jd_decimal(timestamp without time zone) RETURNS float
-LANGUAGE sql
+LANGUAGE sql IMMUTABLE
 AS $_$;
 SELECT CAST(TO_CHAR(($1 - '12:00:00'::interval), 'J') AS float)
            + ( CAST(TO_CHAR(($1 - '12:00:00'::interval), 'SSSS') AS float) / 86400.0 );
@@ -8,7 +15,7 @@ $_$;
 
 
 CREATE OR REPLACE FUNCTION solarlon(timestamp without time zone) RETURNS float
-LANGUAGE plpgsql
+LANGUAGE plpgsql IMMUTABLE
 AS $_$
 DECLARE
     jd float;
@@ -71,6 +78,15 @@ END;
 $_$;
 
 
+
+-------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
+
+---
+--- FLUX BINNING
+---
+
+
 DROP TYPE IF EXISTS fluxbin CASCADE;
 CREATE TYPE fluxbin AS (
     "time" timestamp without time zone,
@@ -88,11 +104,15 @@ CREATE TYPE fluxbin AS (
 CREATE OR REPLACE FUNCTION flux2zhr(float, float) RETURNS float
 LANGUAGE sql
 AS $_$;
+-- Parameters: flux, popindex
 -- Eqn 41 from (Koschak 1990b)
 SELECT ($1 * 37.200) / ( (13.1*$2 - 16.45) * ($2 - 1.3)^0.748 );
 $_$;
 
 
+---
+--- "Classical binning"
+----
 
 CREATE OR REPLACE FUNCTION bin_adaptive(text,
             timestamp without time zone, timestamp without time zone, 
@@ -184,9 +204,85 @@ BEGIN
     END LOOP;
 
     -- Last interval
-    IF (total_met > 0.7*min_meteors) OR (total_eca > 0.7*min_eca) THEN
-            interval.time := intervalstart + (total_offset / total_eca);
-            interval.solarlon := solarlon(interval.time);
+    --IF (total_met > 0.7*min_meteors) OR (total_eca > 0.7*min_eca) THEN
+    --        interval.time := intervalstart + (total_offset / total_eca);
+    --        interval.solarlon := solarlon(interval.time);
+    --        interval.teff := total_teff / 60.0; -- hours
+    --        interval.eca := total_eca / 1000.0; -- 10^3 km^2 h
+    --        interval.met := total_met;
+    --        interval.flux := 1000.0 * (total_met+0.5) / total_eca; -- 10^-3 km^-2 h^-1
+    --        interval.e_flux := 1000.0 * sqrt(total_met+0.5) / total_eca;
+    --        interval.zhr := flux2zhr(interval.flux, popindex);
+    --        interval.reports := total_reports;
+    --    RETURN NEXT interval;
+    --END IF;
+
+    RETURN;
+END;
+$_$;
+
+
+-- Example:
+-- SELECT * FROM bin_adaptive('PER', '2012-08-01'::timestamp, '2012-08-03'::timestamp, 100, 9000, '30 min'::interval, '3 hour'::interval, 0, 1.0)
+
+
+
+---
+--- Binning by solar longitude
+----
+
+CREATE OR REPLACE FUNCTION bin_sollon(myshower text,
+                                      start float,
+                                      stop float,
+                                      years int[] DEFAULT '{2012}',
+                                      min_meteors integer DEFAULT 25,
+                                      min_eca float DEFAULT 25000.0,
+                                      min_interval float DEFAULT 1.0,
+                                      max_interval float DEFAULT 24.0,
+                                      min_alt_station float DEFAULT 10,
+                                      min_eca_station float DEFAULT 0.5,
+                                      gamma float DEFAULT 1.5,
+                                      popindex float DEFAULT 2.0) RETURNS SETOF fluxbin
+LANGUAGE plpgsql
+AS $_$DECLARE
+    myperiod RECORD;
+    total_teff float := 0;
+    total_eca float := 0;
+    total_met integer := 0;
+    total_reports integer := 0;
+    total_offset float := 0;
+    firstPeriod boolean := true;
+    intervalstart float;
+    interval fluxbin;
+BEGIN
+    -- Query 1-minute flux bins
+    FOR myperiod IN (   
+        SELECT
+            sollong,
+            SUM(teff) AS teff,
+            SUM(eca * (SIN(RADIANS(alt))^gamma) / SIN(RADIANS(alt)) ) AS eca,
+            SUM(met) As met,
+            COUNT(*) AS reports
+        FROM flux
+        WHERE 
+            shower = myshower
+            AND sollong BETWEEN start AND stop
+            AND date_part('year', "time") = ANY(years)
+            AND eca IS NOT NULL
+            AND eca > min_eca_station
+            AND alt > min_alt_station
+        GROUP BY sollong
+        ORDER BY sollong) LOOP
+
+        -- Return flux if meteor/eca/timespan thresholds have been reached
+        IF ( ( total_met >= min_meteors 
+               OR total_eca >= min_eca 
+               OR (myperiod.sollong - intervalstart) >= max_interval/24.0
+              )
+              AND (myperiod.sollong - intervalstart) >= min_interval/24.0) THEN
+
+            -- Prepare values to return
+            interval.solarlon := intervalstart + (total_offset / total_eca);
             interval.teff := total_teff / 60.0; -- hours
             interval.eca := total_eca / 1000.0; -- 10^3 km^2 h
             interval.met := total_met;
@@ -194,12 +290,36 @@ BEGIN
             interval.e_flux := 1000.0 * sqrt(total_met+0.5) / total_eca;
             interval.zhr := flux2zhr(interval.flux, popindex);
             interval.reports := total_reports;
-        RETURN NEXT interval;
-    END IF;
 
+            -- Reset vars
+            total_eca := 0;
+            total_teff := 0;
+            total_met := 0;
+            total_reports := 0;
+            total_offset := 0;
+            firstPeriod := true;
+
+            -- Actual row return
+            RETURN NEXT interval;
+        END IF;
+        
+        IF firstPeriod THEN
+            intervalstart := myperiod.sollong;
+            firstPeriod := false;
+        END IF;
+
+        total_teff := total_teff + myperiod.teff;
+        total_eca := total_eca + myperiod.eca;
+        total_met := total_met + myperiod.met;
+        total_reports := total_reports + myperiod.reports;
+        -- make sum of offsets from the first myperiod.mid to average all myperiod.mid's later on   
+        total_offset := total_offset + myperiod.eca * (myperiod.sollong - intervalstart); 
+
+    END LOOP;
     RETURN;
 END;
 $_$;
 
 
--- SELECT * FROM bin_adaptive('PER', '2012-08-01'::timestamp, '2012-08-03'::timestamp, 100, 9000, '30 min'::interval, '3 hour'::interval, 0, 1.0)
+-- Example:
+-- SELECT * FROM bin_sollon('PER', 120.0, 130.0)

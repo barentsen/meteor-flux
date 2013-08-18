@@ -60,62 +60,6 @@ class FluxDB(object):
     #    for key in result[0].keys():
     #        "{0}: {}"
 
-    def bin_adaptive(self, shower, start, stop,
-                     min_interval=1, max_interval=24,
-                     min_meteors=20, min_eca=20, 
-                     min_alt=10, min_eca_station=0.5,
-                     gamma=1.5, popindex=2.0):
-        """Returns a binned flux profile table.
-
-        Parameters
-        ----------
-        shower : string
-            IMO shower code
-
-        start : string
-            ISO timestamp
-
-        stop : string
-            ISO timestamp
-
-        min_meteors : int
-            Minimum number of meteors in each bin.
-
-        min_eca : float [10^3 km^2 h]
-            Minimum ECA in each bin.
-
-        min_interval : float [hours]
-
-        max_interval : float [hours]
-
-        min_alt : float [degrees]
-            Minimum radiant altitude for a flux record to be included.
-
-        min_eca_station : float [degrees]
-            Minimum ECA for a flux record to be included.
-
-        gamma : float
-            Zenith correction exponent.
-
-        popindex : float
-            Population index.
-
-        Returns
-        -------
-        Result of the query.
-        """
-        return self.query("""SELECT * FROM
-                             bin_adaptive(%s, %s::timestamp, %s::timestamp,
-                                          %s, %s,
-                                          '%s hours'::interval,
-                                          '%s hours'::interval,
-                                          %s, %s, %s, %s)
-                          """, (shower, start, stop,
-                                min_meteors, min_eca,
-                                min_interval, max_interval,
-                                min_alt, min_eca_station,
-                                gamma, popindex, ))
-
 
     ################
     # DATA INGESTION
@@ -233,6 +177,8 @@ class FluxDB(object):
         self.cur.execute("""CREATE INDEX {0}_time_shower_idx ON {0}
                             USING btree (time, shower);""".format(
                                                            self.fluxtable))
+
+        """CREATE INDEX flux_sollon_shower_idx ON flux USING btree (sollong, shower);"""
         if self.autocommit:
             self.commit()
 
@@ -246,3 +192,4 @@ class FluxDB(object):
             self.cur.execute(sql)
         if self.autocommit:
             self.commit()        
+
