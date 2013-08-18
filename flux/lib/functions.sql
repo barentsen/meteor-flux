@@ -114,23 +114,20 @@ $_$;
 --- "Classical binning"
 ----
 
-CREATE OR REPLACE FUNCTION bin_adaptive(text,
-            timestamp without time zone, timestamp without time zone, 
-            integer, float, interval, interval, 
-            float, float, float, float) RETURNS SETOF fluxbin
+CREATE OR REPLACE FUNCTION VideoProfile(myshower text,
+                                        start timestamp without time zone,
+                                        stop timestamp without time zone, 
+                                        min_meteors integer DEFAULT 25,
+                                        min_eca float DEFAULT 25000.0,
+                                        min_interval interval DEFAULT '1 hour'::interval,
+                                        max_interval interval DEFAULT '24 hour'::interval, 
+                                        min_alt_station float DEFAULT 10.0,
+                                        min_eca_station float DEFAULT 0.5,
+                                        gamma float DEFAULT 1.5,
+                                        popindex float DEFAULT 2.0)
+RETURNS SETOF fluxbin
 LANGUAGE plpgsql
 AS $_$DECLARE
-    myshower ALIAS FOR $1;
-    start ALIAS FOR $2;
-    stop ALIAS FOR $3;
-    min_meteors ALIAS FOR $4;
-    min_eca ALIAS FOR $5;
-    min_interval ALIAS FOR $6;
-    max_interval ALIAS FOR $7;
-    min_alt_station ALIAS FOR $8;
-    min_eca_station ALIAS FOR $9;
-    gamma ALIAS FOR $10;
-    popindex ALIAS FOR $11;
     myperiod RECORD;
     total_teff float := 0;
     total_eca float := 0;
@@ -231,18 +228,116 @@ $_$;
 --- Binning by solar longitude
 ----
 
-CREATE OR REPLACE FUNCTION bin_sollon(myshower text,
-                                      start float,
-                                      stop float,
-                                      years int[] DEFAULT '{2012}',
-                                      min_meteors integer DEFAULT 25,
-                                      min_eca float DEFAULT 25000.0,
-                                      min_interval float DEFAULT 1.0,
-                                      max_interval float DEFAULT 24.0,
-                                      min_alt_station float DEFAULT 10,
-                                      min_eca_station float DEFAULT 0.5,
-                                      gamma float DEFAULT 1.5,
-                                      popindex float DEFAULT 2.0) RETURNS SETOF fluxbin
+CREATE OR REPLACE FUNCTION SolVideoProfile(myshower text,
+                                          year integer,
+                                          start numeric,
+                                          stop numeric,
+                                          min_meteors integer DEFAULT 25,
+                                          min_eca float DEFAULT 25000.0,
+                                          min_interval float DEFAULT 1.0,
+                                          max_interval float DEFAULT 24.0,
+                                          min_alt_station float DEFAULT 10,
+                                          min_eca_station float DEFAULT 0.5,
+                                          gamma float DEFAULT 1.5,
+                                          popindex float DEFAULT 2.0)
+RETURNS SETOF fluxbin
+LANGUAGE plpgsql
+AS $_$DECLARE
+    myperiod RECORD;
+    total_teff float := 0;
+    total_eca float := 0;
+    total_met integer := 0;
+    total_reports integer := 0;
+    total_offset float := 0;
+    firstPeriod boolean := true;
+    intervalstart float;
+    interval fluxbin;
+BEGIN
+    -- Query 1-minute flux bins
+    FOR myperiod IN (   
+        SELECT
+            sollong,
+            SUM(teff) AS teff,
+            SUM(eca * (SIN(RADIANS(alt))^gamma) / SIN(RADIANS(alt)) ) AS eca,
+            SUM(met) As met,
+            COUNT(*) AS reports
+        FROM flux
+        WHERE 
+            shower = myshower
+            AND time BETWEEN (year || '-01-01')::timestamp AND (year || '-12-31')::timestamp
+            AND sollong BETWEEN start AND stop
+            AND eca IS NOT NULL
+            AND eca > min_eca_station
+            AND alt > min_alt_station
+        GROUP BY sollong
+        ORDER BY sollong) LOOP
+
+        -- Return flux if meteor/eca/timespan thresholds have been reached
+        IF ( ( total_met >= min_meteors 
+               OR total_eca >= min_eca 
+               OR (myperiod.sollong - intervalstart) >= max_interval/24.0
+              )
+              AND (myperiod.sollong - intervalstart) >= min_interval/24.0) THEN
+
+            -- Prepare values to return
+            interval.solarlon := intervalstart + (total_offset / total_eca);
+            interval.teff := total_teff / 60.0; -- hours
+            interval.eca := total_eca / 1000.0; -- 10^3 km^2 h
+            interval.met := total_met;
+            interval.flux := 1000.0 * (total_met+0.5) / total_eca; -- 10^-3 km^-2 h^-1
+            interval.e_flux := 1000.0 * sqrt(total_met+0.5) / total_eca;
+            interval.zhr := flux2zhr(interval.flux, popindex);
+            interval.reports := total_reports;
+
+            -- Reset vars
+            total_eca := 0;
+            total_teff := 0;
+            total_met := 0;
+            total_reports := 0;
+            total_offset := 0;
+            firstPeriod := true;
+
+            -- Actual row return
+            RETURN NEXT interval;
+        END IF;
+        
+        IF firstPeriod THEN
+            intervalstart := myperiod.sollong;
+            firstPeriod := false;
+        END IF;
+
+        total_teff := total_teff + myperiod.teff;
+        total_eca := total_eca + myperiod.eca;
+        total_met := total_met + myperiod.met;
+        total_reports := total_reports + myperiod.reports;
+        -- make sum of offsets from the first myperiod.mid to average all myperiod.mid's later on   
+        total_offset := total_offset + myperiod.eca * (myperiod.sollong - intervalstart); 
+
+    END LOOP;
+    RETURN;
+END;
+$_$;
+
+
+---
+--- Video profile by solar longitude, averaged over multiple years
+----
+-- Example:
+-- SELECT * FROM AvgVideoProfile('PER', '{2001,2002,2003,2004,2012,2011,2010}', 100, 200)
+
+CREATE OR REPLACE FUNCTION AvgVideoProfile(myshower text,
+                                          years integer[],
+                                          start float,
+                                          stop float,
+                                          min_meteors integer DEFAULT 25,
+                                          min_eca float DEFAULT 25000.0,
+                                          min_interval float DEFAULT 1.0,
+                                          max_interval float DEFAULT 24.0,
+                                          min_alt_station float DEFAULT 10,
+                                          min_eca_station float DEFAULT 0.5,
+                                          gamma float DEFAULT 1.5,
+                                          popindex float DEFAULT 2.0)
+RETURNS SETOF fluxbin
 LANGUAGE plpgsql
 AS $_$DECLARE
     myperiod RECORD;
@@ -319,7 +414,3 @@ BEGIN
     RETURN;
 END;
 $_$;
-
-
--- Example:
--- SELECT * FROM bin_sollon('PER', 120.0, 130.0)

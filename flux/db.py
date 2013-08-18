@@ -173,14 +173,19 @@ class FluxDB(object):
         """Creates the indexes needed.
         """
         log.info('Creating indexes on {0}'.format(self.fluxtable))
+        log.info('Creating index on dataset_id')
         self.cur.execute("""CREATE INDEX {0}_dataset_idx ON {0}
                             USING btree (dataset_id);""".format(
                                                          self.fluxtable))
+        log.info('Creating index on (time,shower)')
         self.cur.execute("""CREATE INDEX {0}_time_shower_idx ON {0}
                             USING btree (time, shower);""".format(
                                                            self.fluxtable))
+        log.info('Creating index on (sollong, shower)')
+        self.cur.execute("""CREATE INDEX {0}_sollong_shower_idx ON {0}
+                            USING btree (sollong, shower);""".format(
+                                                           self.fluxtable))
 
-        """CREATE INDEX flux_sollon_shower_idx ON flux USING btree (sollong, shower);"""
         if self.autocommit:
             self.commit()
 

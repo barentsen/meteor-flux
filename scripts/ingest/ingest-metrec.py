@@ -27,10 +27,12 @@ if __name__ == '__main__':
     #log.setLevel('DEBUG')
     #with log.log_to_file('ingestion.log'):
 
-    mydb = db.FluxDB()
+    mydb = db.FluxDB(autocommit=False)
 
     if os.path.isdir(path):
         log.info("%s is a directory, will ingest all *.zip files inside." % path)
         metrec.ingest_dir(path, mydb)
     else:
         myzip = metrec.ingest_zip(path, mydb)
+
+    mydb.commit()

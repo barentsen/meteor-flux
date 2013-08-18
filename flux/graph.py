@@ -15,105 +15,6 @@ import util
 TMP_LOCAL = '/tmp'
 TMP_PUBLIC = 'http://tbd/'
 
-class VideoFluxProfile(object):
-
-    def __init__(self, fluxdb,
-                 shower, start, stop,
-                 min_interval=1, max_interval=24,
-                 min_meteors=20, min_eca=20, 
-                 min_alt=10, min_eca_station=0.5,
-                 gamma=1.5, popindex=2.0):
-        """
-
-        Parameters
-        ----------
-        shower : string
-            IMO shower code
-
-        start : string
-            ISO timestamp
-
-        stop : string
-            ISO timestamp
-
-        min_meteors : int
-            Minimum number of meteors in each bin.
-
-        min_eca : float [10^3 km^2 h]
-            Minimum ECA in each bin.
-
-        min_interval : float [hours]
-
-        max_interval : float [hours]
-
-        min_alt : float [degrees]
-            Minimum radiant altitude for a flux record to be included.
-
-        min_eca_station : float [degrees]
-            Minimum ECA for a flux record to be included.
-
-        gamma : float
-            Zenith correction exponent.
-
-        popindex : float
-            Population index.
-
-        Returns
-        -------
-        Result of the query.
-        """
-        self.start = Time(start, scale='utc')
-        self.stop = Time(stop, scale='utc')
-        self.popindex = popindex
-        self.gamma = gamma
-        self.fluxes = fluxdb.query("""SELECT * FROM
-                                    bin_adaptive(%s,
-                                                 %s::timestamp,
-                                                 %s::timestamp,
-                                                 %s, %s,
-                                                 '%s hours'::interval,
-                                                 '%s hours'::interval,
-                                                 %s, %s, %s, %s)
-                                """, (shower, 
-                                      start, 
-                                      stop,
-                                      min_meteors, min_eca,
-                                      min_interval, max_interval,
-                                      min_alt, min_eca_station,
-                                      gamma, popindex, ))
-
-    def field(self, key):
-        return np.array([row[key] for row in self.fluxes])
-
-    def get_json(self):
-        graph_filename = self.get_graph()
-        if self.fluxes is None or len(self.fluxes) == 0:
-            log.error('Could not find fluxes')
-            json = '{"status":"ERROR"}'
-        else:
-            json = '{{"status":"OK", "graph":"{0}", "flux": ['.format(graph_filename)
-            for i, row in enumerate(self.fluxes):
-                if i > 0:
-                    json += ', \n'
-                json += '{'
-                json += '"time":"{0}", '.format(str(row['time'])[0:16])
-                json += '"sollon":{0:.3f}, '.format(row['solarlon'])
-                json += '"teff":{0:.1f}, '.format(row['teff'])
-                json += '"eca":{0:.1f}, '.format(row['eca'])
-                json += '"met":{0}, '.format(row['met'])
-                json += '"flux":{0:.1f}, '.format(row['flux'])
-                json += '"e_flux":{0:.1f}, '.format(row['e_flux'])
-                json += '"zhr":{0:.0f}'.format(row['zhr'])
-                json += '}'
-            json += ']}'
-        
-        return json
-
-    def get_graph(self):
-        graph = VideoFluxGraph(self)
-        return graph.save()
-
-
 
 
 
@@ -140,8 +41,55 @@ class BaseGraph(object):
         else:
             return myfile
 
+    ######################
+    # LABEL FORMATTER FUNCTIONS
+    ######################
 
-class VideoFluxGraph(BaseGraph):
+    def sollon_formatter(self, a, b):
+        """
+        a: ordinal datetime
+        b: tick nr 
+        Usage: ax.xaxis.set_major_formatter(pylab.FuncFormatter(sollon_formatter)) 
+        """
+        # 10 days
+        if self.timespan > 10*24*3600:
+            fmt = "%.1f"
+        # 1 day
+        elif self.timespan > 24*3600:
+            fmt = "%.2f"
+        else:
+            fmt = "%.3f"
+        d = datetime.datetime.fromordinal(int(a))+datetime.timedelta(a-int(a))
+        return fmt % util.sollon(d)
+
+    def date_formatter(self, a, b):
+        """
+        a: ordinal datetime
+        b: tick nr 
+        Usage: ax.xaxis.set_major_formatter(pylab.FuncFormatter(sollon_formatter)) 
+        """
+        d = datetime.datetime.fromordinal(int(a))+datetime.timedelta(a-int(a))
+        if self.timespan > 56:
+            fmt = '%d %b'
+        else:
+            fmt = '%H:%M\n(%d %b)'
+        
+        return d.strftime(fmt)
+
+    def zhr_formatter(self, a, b):
+        zhr = util.flux2zhr(a, self.get_popindex())
+        if round(zhr) < 10:
+            return "%.1f" % zhr
+        else:
+            return "%.0f" % zhr
+
+    def get_popindex(self):
+        return self.profile.popindex
+
+
+
+class VideoGraph(BaseGraph):
+    """Graph with a time axis at the bottom and a sollon axis at top."""
 
     def __init__(self, profile, ymax=None):
         BaseGraph.__init__(self)
@@ -274,47 +222,85 @@ class VideoFluxGraph(BaseGraph):
         plt.setp(labels, rotation=45, fontsize=12)
 
 
-    ######################
-    # FORMATTER FUNCTIONS
-    ######################
 
-    def sollon_formatter(self, a, b):
-        """
-        a: ordinal datetime
-        b: tick nr 
-        Usage: ax.xaxis.set_major_formatter(pylab.FuncFormatter(sollon_formatter)) 
-        """
-        # 10 days
-        if self.timespan > 10*24*3600:
-            fmt = "%.1f"
-        # 1 day
-        elif self.timespan > 24*3600:
-            fmt = "%.2f"
-        else:
-            fmt = "%.3f"
-        d = datetime.datetime.fromordinal(int(a))+datetime.timedelta(a-int(a))
-        return fmt % util.sollon(d)
 
-    def date_formatter(self, a, b):
+
+class SolVideoGraph(BaseGraph):
+    """Graph with a time axis at the bottom and a sollon axis at top."""
+
+    def __init__(self, profiles, ymax=None):
         """
-        a: ordinal datetime
-        b: tick nr 
-        Usage: ax.xaxis.set_major_formatter(pylab.FuncFormatter(sollon_formatter)) 
+        Parameters
+        ----------
+        profiles : FluxProfile or list of FluxProfiles
         """
-        d = datetime.datetime.fromordinal(int(a))+datetime.timedelta(a-int(a))
-        if self.timespan > 56:
-            fmt = '%d %b'
-        else:
-            fmt = '%H:%M\n(%d %b)'
+        BaseGraph.__init__(self)
         
-        return d.strftime(fmt)
-
-    def zhr_formatter(self, a, b):
-        zhr = util.flux2zhr(a, self.profile.popindex)
-        if round(zhr) < 10:
-            return "%.1f" % zhr
+        # Profile can be a list or a single instance
+        if isinstance(profiles, (list)):
+            self.profiles = profiles
         else:
-            return "%.0f" % zhr
+            self.profiles = [profiles]       
+
+        self.timespan = (self.profiles[0].stop - self.profiles[0].start) # hours
+        self.ymax = ymax
+
+    
+    def plot(self):
+        self.setup_axes()
+
+        for p in self.profiles:
+            self.ax.errorbar(p.field('solarlon'),
+                             p.field('flux'),
+                             yerr=p.field('e_flux'),
+                             fmt="s", ms=4, lw=1.0, c='red',
+                             label=p.label)
+        
+        if len(self.profiles) > 0:
+            self.ax.legend()
+
+        self.setup_limits()
+        self.setup_labels()
+       
+
+    def setup_axes(self):
+        self.ax = plt.subplot(111)
+        
+        # Second Y axis on the right for the ZHR 
+        self.ax_zhr = plt.twinx(ax=self.ax)
+        self.ax_zhr.set_ylabel("ZHR (r=%.1f)" % self.profiles[0].popindex, fontsize=16)
+        self.ax_zhr.yaxis.set_major_formatter(plt.FuncFormatter(self.zhr_formatter))
+                       
+        self.ax.grid(which="both")
+
+    def setup_limits(self):
+        self.ax.set_xlim([self.profiles[0].start, self.profiles[0].stop])
+        self.ax_zhr.set_xlim([self.profiles[0].start, self.profiles[0].stop])
+
+        flux = np.concatenate([p.field('flux') for p in self.profiles])
+        e_flux = np.concatenate([p.field('e_flux') for p in self.profiles])
+
+        # Determine the limit of the Y axis
+        if self.ymax:
+            my_ymax = self.ymax
+        elif len(flux) == 0:
+            my_ymax = 100
+        else:
+            my_ymax = 1.1*max(flux+e_flux)
+
+        self.ax.set_ylim([0, my_ymax])
+        self.ax_zhr.set_ylim([0, my_ymax])      
 
 
+    def setup_labels(self):
+        self.ax.set_ylabel("Meteoroids / 1000$\cdot$km$^{2}\cdot$h", fontsize=18)
+        self.ax.set_xlabel("Solar longitude (J2000.0)", fontsize=18)
+        self.ax.xaxis.set_major_formatter(plt.FuncFormatter(self.sollon_formatter))
+        
+        #labels = self.ax.get_xmajorticklabels()
+        #plt.setp(labels, rotation=45, fontsize=14) 
+        #labels = self.ax.get_xminorticklabels()
+        #plt.setp(labels, rotation=45, fontsize=12)
 
+    def get_popindex(self):
+        return self.profiles[0].popindex
