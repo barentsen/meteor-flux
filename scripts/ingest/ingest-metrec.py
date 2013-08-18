@@ -11,6 +11,7 @@ import datetime
 from astropy import log
 
 from flux import metrec
+from flux import db
 
 #######
 # MAIN

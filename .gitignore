@@ -13,3 +13,5 @@ old/
 .tox
 nosetests.xml
 
+nohup.out
+
