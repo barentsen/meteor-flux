@@ -152,12 +152,12 @@ def ingest_zip(path, mydb, remove_old=True):
     mydb.ingest_json(myzip.get_json())
     return myzip
 
-def ingest_dir(path, mydb):
+def ingest_dir(path, mydb, remove_old=True):
     for filename in os.listdir(path):
         full_path = os.path.join(path, filename)
         if not os.path.isdir(full_path):
             try:
-                myzip = ingest_zip(full_path, mydb)
+                myzip = ingest_zip(full_path, mydb, remove_old)
             except zipfile.BadZipfile:
                 log.warning("%s is not a valid ZIP file." % filename)
             except Exception as e:

@@ -201,7 +201,7 @@
 			max: 3.38,
 			step:0.001,
 			//values: [ Math.log(0.166667) / Math.log(10), Math.log(24) / Math.log(10) ],
-			values: [ Math.log(1) / Math.log(10), Math.log(24) / Math.log(10) ],
+			values: [ Math.log(2) / Math.log(10), Math.log(24) / Math.log(10) ],
 			slide: function( event, ui ) {
 				$( "#duration" ).text( format_duration(ui.values[0]) + " - " + format_duration(ui.values[1]) );
 			}
