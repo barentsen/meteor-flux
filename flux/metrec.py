@@ -136,14 +136,29 @@ class MetRecData(object):
         return data
 
 
-
-
 ###########
 # FUNCTIONS
 ###########
 
 def ingest_zip(path, mydb, remove_old=True):
-    """Adds a single ZIP file to the FluxViewer database"""
+    """Adds a single metrec flux zip file to the database.
+
+    Parameters
+    ----------
+    path : str
+        Location of the data.
+
+    mydb : FluxDB object
+        Database in which to ingest.
+
+    remove_old : bool
+        If true, search and delete any previous version of a file with
+        the same filename (i.e. dataset_id). This slows things down!
+
+    Returns
+    -------
+    MetRecData object that was ingested.
+    """
     log.info("Ingesting %s" % path)
     myzip = MetRecData(path)
     # Make sure any previous version of this dataset is removed
@@ -153,6 +168,10 @@ def ingest_zip(path, mydb, remove_old=True):
     return myzip
 
 def ingest_dir(path, mydb, remove_old=True):
+    """Ingest a directory of MetRec zipped flux files.
+
+    Parameters are identical to ingest_zip().
+    """
     for filename in os.listdir(path):
         full_path = os.path.join(path, filename)
         if not os.path.isdir(full_path):

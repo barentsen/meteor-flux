@@ -46,6 +46,12 @@ class BaseGraph(object):
                                              delete=False)
         self.fig.savefig(myfile, format=format, dpi=dpi)
         
+        myfile2 = tempfile.NamedTemporaryFile(prefix=prefix,
+                                             suffix='.pdf',
+                                             dir=tmpdir,
+                                             delete=False)
+        self.fig.savefig(myfile2, format='pdf', dpi=dpi)
+
         if web:
             return config.TMPDIR_WWW+'/'+os.path.basename(myfile.name)
             myfile.close()
