@@ -14,7 +14,7 @@ if HOSTNAME == 'gvm':
 if HOSTNAME == 'flux':  # testing machine
     DEBUG = False
     DBINFO = 'dbname=fluxdb user=postgres'
-    TMPDIR = '/tmp'
+    TMPDIR = '/mnt/tmp'
     TMPDIR_WWW = '/tmp'
 else:
     DEBUG = False
