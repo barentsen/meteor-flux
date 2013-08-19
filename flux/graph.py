@@ -46,10 +46,7 @@ class BaseGraph(object):
                                              delete=False)
         self.fig.savefig(myfile, format=format, dpi=dpi)
         
-        myfile2 = tempfile.NamedTemporaryFile(prefix=prefix,
-                                             suffix='.pdf',
-                                             dir=tmpdir,
-                                             delete=False)
+        myfile2 = myfile.replace('png', 'pdf')
         self.fig.savefig(myfile2, format='pdf', dpi=dpi)
 
         if web:
