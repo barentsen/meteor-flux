@@ -23,15 +23,15 @@ from flask import Flask, request, json
 from flux import db, profile, graph, util
 from astropy import log, time
 
-app = Flask('flux')
+fluxapp = Flask('flux')
 MYDB = db.FluxDB()
 
-@app.route("/")
+@fluxapp.route("/")
 def index():
     """When you request the root path, you'll get the index.html"""
     return "Hello world"
 
-@app.route('/api/flux', methods=['GET'])
+@fluxapp.route('/api/flux', methods=['GET'])
 @util.crossdomain(origin='*')
 def flux():
     """Returns flux data.
