@@ -96,7 +96,7 @@
                               "Crunching data</div>");
         
         // Where is the service?
-        url = "http://localhost:8042/api/flux?"
+        url = "/api/flux?"
 
         // Which are the parameters?
         url += "shower=" + $( '#showercode' ).val();
