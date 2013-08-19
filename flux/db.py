@@ -10,11 +10,13 @@ import psycopg2.extras
 from StringIO import StringIO
 from astropy import log
 
+import config
+
 
 class FluxDB(object):
 
     def __init__(self,
-                 dbinfo='dbname=fluxdb user=postgres',
+                 dbinfo=config.DBINFO,
                  prefix='', 
                  autocommit=True):
         """Constructor
