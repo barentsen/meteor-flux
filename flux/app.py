@@ -26,6 +26,9 @@ from astropy import log, time
 fluxapp = Flask('flux', static_url_path='')
 MYDB = db.FluxDB()
 
+@fluxapp.route('/')
+def root():
+    return fluxapp.send_static_file('index.html')
 
 @fluxapp.route('/api/flux', methods=['GET'])
 @util.crossdomain(origin='*')
