@@ -3,6 +3,7 @@
 """Plot flux graphs."""
 import numpy as np
 import matplotlib as mpl
+matplotlib.use('Agg')  # Avoid needing X
 import matplotlib.pyplot as plt
 import datetime
 import tempfile
