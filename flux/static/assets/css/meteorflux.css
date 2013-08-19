@@ -48,6 +48,10 @@ h1, h2, h3 {
     padding: 20px;
 }
 
+.checkbox {
+    margin-left: 20px;
+}
+
 .please-wait > img {
     margin: 20px;
 }
