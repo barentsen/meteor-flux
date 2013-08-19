@@ -15,7 +15,7 @@
 		{code:"CAP", r:"2.5", begin:"07/03", end:"08/15", max:"07/30", name:"alpha-Capricornids "},			
 		{code:"PER", r:"2.2", begin:"07/17", end:"08/24", max:"08/12", name:"Perseids           "},
 		{code:"KCG", r:"3.0", begin:"08/03", end:"08/25", max:"08/17", name:"kappa-Cygnids      "},
-		{code:"AUR", r:"2.5", begin:"08/25", end:"09/8 ", max:"09/01", name:"alpha-Aurigids     "},
+		{code:"AUR", r:"2.5", begin:"08/25", end:"09/08", max:"09/01", name:"alpha-Aurigids     "},
 		{code:"SPE", r:"3.0", begin:"09/05", end:"09/17", max:"09/09", name:"September-Perseids "},
 		{code:"DAU", r:"3.0", begin:"09/18", end:"10/10", max:"10/04", name:"delta-Aurigids     "},
 		{code:"OCA", r:"3.0", begin:"10/05", end:"10/07", max:"10/06", name:"Oct-Camelopardalids"},
