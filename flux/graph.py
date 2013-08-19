@@ -10,24 +10,35 @@ from astropy import log
 from astropy.time import Time
 import os
 
+import config
 import util
 
-TMP_LOCAL = '/tmp'
-TMP_PUBLIC = 'http://tbd/'
-
-
+params = {'backend': 'Agg',
+          'axes.labelsize': 18,
+          'text.fontsize': 16,
+          'legend.fontsize': 16,
+          'xtick.labelsize': 14,
+          'xtick.major.size': 8,
+          'xtick.minor.size': 4,
+          'ytick.labelsize': 14,
+          'figure.figsize': (11,6)}
+plt.rcParams.update(params)
+#plt.rcParams['axes.facecolor'] = 'F0F0F0'
+#plt.rcParams['axes.edgecolor'] = 'E7E7E7'
+plt.rcParams['axes.color_cycle'] = ['C5000B', '0084D1', '008000', 'FFD320']
 
 
 class BaseGraph(object):
 
     def __init__(self):
-        self.fig = plt.figure(figsize=(11,6), dpi=80) # 11*80 = 880 pixels wide!
+        self.fig = plt.figure(dpi=config.DPI) # 11*80 = 880 pixels wide!
         self.fig.subplots_adjust(0.1,0.17,0.92,0.87)
 
     def show(self):
         self.fig.show()        
         
-    def save(self, prefix='flux', format='png', dpi=100, tmpdir=TMP_LOCAL, web=True):
+    def save(self, prefix='flux', format='png', dpi=config.DPI,
+             tmpdir=config.TMPDIR, web=True):
         myfile = tempfile.NamedTemporaryFile(prefix=prefix,
                                              suffix='.'+format,
                                              dir=tmpdir,
@@ -35,7 +46,7 @@ class BaseGraph(object):
         self.fig.savefig(myfile, format=format, dpi=dpi)
         
         if web:
-            return TMP_PUBLIC+os.path.basename(myfile.name)
+            return config.TMPDIR_WWW+'/'+os.path.basename(myfile.name)
             myfile.close()
             plt.close()
         else:
@@ -113,15 +124,17 @@ class VideoGraph(BaseGraph):
 
     def setup_axes(self):
         self.ax = plt.subplot(111)
-        
+
         # Second Y axis on the right for the ZHR 
         self.ax_zhr = plt.twinx(ax=self.ax)
-        self.ax_zhr.set_ylabel("ZHR (r=%.1f)" % self.profile.popindex, fontsize=16)
+        self.ax_zhr.set_ylabel("ZHR (r={0:.1f}, $\gamma$={1:.2f})".format(
+                                                self.profile.popindex,
+                                                self.profile.gamma))
         self.ax_zhr.yaxis.set_major_formatter(plt.FuncFormatter(self.zhr_formatter))
         
         # Second X axis as top for the solar longitude
         self.ax2 = plt.twiny(ax=self.ax)
-        self.ax2.set_xlabel("Solar longitude (J2000.0)", fontsize=16)
+        self.ax2.set_xlabel("Solar longitude (J2000.0)")
         self.ax2.xaxis.set_major_formatter(plt.FuncFormatter(self.sollon_formatter))
           
         self.ax.grid(which="both")
@@ -213,13 +226,13 @@ class VideoGraph(BaseGraph):
 
 
     def setup_labels(self):
-        self.ax.set_ylabel("Meteoroids / 1000$\cdot$km$^{2}\cdot$h", fontsize=18)
-        self.ax.set_xlabel(self.xlabel, fontsize=18)
+        self.ax.set_ylabel("Meteoroids / 1000$\cdot$km$^{2}\cdot$h")
+        self.ax.set_xlabel(self.xlabel)
         
         labels = self.ax.get_xmajorticklabels()
-        plt.setp(labels, rotation=45, fontsize=14) 
+        plt.setp(labels, rotation=45) 
         labels = self.ax.get_xminorticklabels()
-        plt.setp(labels, rotation=45, fontsize=12)
+        plt.setp(labels, rotation=45)
 
 
 
@@ -253,10 +266,10 @@ class SolVideoGraph(BaseGraph):
             self.ax.errorbar(p.field('solarlon'),
                              p.field('flux'),
                              yerr=p.field('e_flux'),
-                             fmt="s", ms=4, lw=1.0, c='red',
+                             fmt="s", ms=4, lw=1.0,
                              label=p.label)
         
-        if len(self.profiles) > 0:
+        if len(self.profiles) > 1:
             self.ax.legend()
 
         self.setup_limits()
@@ -268,7 +281,9 @@ class SolVideoGraph(BaseGraph):
         
         # Second Y axis on the right for the ZHR 
         self.ax_zhr = plt.twinx(ax=self.ax)
-        self.ax_zhr.set_ylabel("ZHR (r=%.1f)" % self.profiles[0].popindex, fontsize=16)
+        self.ax_zhr.set_ylabel("ZHR (r={0:.1f}, $\gamma$={1:.2f})".format(
+                                                self.profiles[0].popindex,
+                                                self.profiles[0].gamma))
         self.ax_zhr.yaxis.set_major_formatter(plt.FuncFormatter(self.zhr_formatter))
                        
         self.ax.grid(which="both")
@@ -293,10 +308,9 @@ class SolVideoGraph(BaseGraph):
 
 
     def setup_labels(self):
-        self.ax.set_ylabel("Meteoroids / 1000$\cdot$km$^{2}\cdot$h", fontsize=18)
-        self.ax.set_xlabel("Solar longitude (J2000.0)", fontsize=18)
-        self.ax.xaxis.set_major_formatter(plt.FuncFormatter(self.sollon_formatter))
-        
+        self.ax.set_ylabel("Meteoroids / 1000$\cdot$km$^{2}\cdot$h")
+        self.ax.set_xlabel("Solar longitude (J2000.0)")
+                
         #labels = self.ax.get_xmajorticklabels()
         #plt.setp(labels, rotation=45, fontsize=14) 
         #labels = self.ax.get_xminorticklabels()

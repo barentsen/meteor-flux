@@ -1,0 +1,81 @@
+@import url('http://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic,900');
+
+
+body {
+    margin:0;
+    font-family:"Lato","Helvetica Neue",Helvetica,Arial,sans-serif;
+    font-size:17px;
+    line-height:24px;
+    color:#444;
+    background-color:#fff;
+}
+
+h1, h2, h3 {
+    font-family:"Lato","Helvetica Neue",Helvetica,Arial,sans-serif;
+}
+
+.navbar-brand {
+    font-size: 20px;
+    font-weight: 900;
+}
+
+/* Wrapping element */
+/* Set some basic padding to keep content from hitting the edges */
+.body-content {
+  padding-left: 15px;
+  padding-right: 15px;
+}
+
+.form-customise {
+    padding-left: 20px;
+    padding-top: 20px;
+}
+
+.tab-content {
+    padding-left: 0px;
+    padding-top: 25px;
+    padding-bottom: 5px;
+    background-color: #f0f0f0;
+}
+
+.btn-graph {
+    margin: 20px;
+}
+
+.please-wait {
+    font-size:2em;
+    padding: 20px;
+}
+
+.please-wait > img {
+    margin: 20px;
+}
+
+.img-flux {
+    margin-top: 1em;
+    margin-bottom: 2em;
+}
+
+.table-flux th, .table-flux td {
+    font-size: 0.9em;
+    text-align: center;
+}
+
+.padding20 {
+    padding: 20px;
+}
+
+.footer {
+    border-top: 1px solid #e7e7e7;
+    background-color: #f8f8f8;
+    margin-top: 40px;
+}
+
+.footer .container {
+    //text-align:center;
+    padding: 20px;
+    color: #666;
+    font-size: 14px;
+    line-height: 18px;
+
+}
