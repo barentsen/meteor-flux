@@ -23,13 +23,9 @@ from flask import Flask, request, json
 from flux import db, profile, graph, util
 from astropy import log, time
 
-fluxapp = Flask('flux')
+fluxapp = Flask('flux', static_url_path='')
 MYDB = db.FluxDB()
 
-@fluxapp.route("/")
-def index():
-    """When you request the root path, you'll get the index.html"""
-    return "Hello world"
 
 @fluxapp.route('/api/flux', methods=['GET'])
 @util.crossdomain(origin='*')
@@ -44,7 +40,7 @@ def flux():
         shower = request.args.get('shower')
         start = time.Time(request.args.get('start'), scale='utc')
         stop = time.Time(request.args.get('stop'), scale='utc')
-        years = request.args.get('year').split(',')
+        year = request.args.get('year', default='', type=str)
         avg = request.args.get('avg', default='false', type=str)
         min_interval = request.args.get('min_interval', default=1, type=float)
         max_interval = request.args.get('max_interval', default=24, type=float)
@@ -54,7 +50,7 @@ def flux():
         gamma = request.args.get('gamma', default=1.5, type=float)
         popindex = request.args.get('popindex', default=2.0, type=float)
         
-        log.info(avg)
+        years = year.split(',')
         if avg == 'false' and len(years) == 1:
             myprofile = profile.VideoProfile(MYDB, shower, start, stop,
                                            min_interval=min_interval,
