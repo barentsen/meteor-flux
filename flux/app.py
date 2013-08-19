@@ -24,7 +24,6 @@ from flux import db, profile, graph, util
 from astropy import log, time
 
 fluxapp = Flask('flux', static_url_path='')
-MYDB = db.FluxDB()
 
 @fluxapp.route('/')
 def root():
@@ -53,9 +52,11 @@ def flux():
         gamma = request.args.get('gamma', default=1.5, type=float)
         popindex = request.args.get('popindex', default=2.0, type=float)
         
+        mydb = db.FluxDB()
+
         years = year.split(',')
         if avg == 'false' and len(years) == 1:
-            myprofile = profile.VideoProfile(MYDB, shower, start, stop,
+            myprofile = profile.VideoProfile(mydb, shower, start, stop,
                                            min_interval=min_interval,
                                            max_interval=max_interval,
                                            min_meteors=min_meteors,
@@ -69,7 +70,7 @@ def flux():
             sollon_stop = util.sollon(stop.datetime)
             profiles = []
             for myyear in years:
-                profiles.append(profile.AvgVideoProfile(MYDB, 
+                profiles.append(profile.AvgVideoProfile(mydb, 
                                            shower, [myyear],
                                            sollon_start, sollon_stop,
                                            min_interval=min_interval,
@@ -88,7 +89,7 @@ def flux():
         elif avg == 'true':
             sollon_start = util.sollon(start.datetime)
             sollon_stop = util.sollon(stop.datetime)
-            myprofile = profile.AvgVideoProfile(MYDB, 
+            myprofile = profile.AvgVideoProfile(mydb, 
                                            shower, years,
                                            sollon_start, sollon_stop,
                                            min_interval=min_interval,
