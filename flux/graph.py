@@ -270,7 +270,8 @@ class SolVideoGraph(BaseGraph):
             self.ax.errorbar(p.field('solarlon'),
                              p.field('flux'),
                              yerr=p.field('e_flux'),
-                             fmt="s", ms=4, lw=1.0,
+                             fmt=p.marker,
+                             ms=4, lw=1.0,
                              label=p.label)
         
         if len(self.profiles) > 1:

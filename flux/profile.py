@@ -167,7 +167,8 @@ class SolVideoProfile(BaseProfile):
                  min_alt=10, min_eca_station=0.5,
                  gamma=DEFAULT_GAMMA,
                  popindex=DEFAULT_POPINDEX,
-                 label=None):
+                 label=None,
+                 marker='s'):
         """
 
         Parameters
@@ -222,6 +223,7 @@ class SolVideoProfile(BaseProfile):
         else:
             #self.label = '{0} {1}'.format(shower, year)
             self.label = str(year)
+        self.marker = marker
         self.fluxes = self.fluxdb.query("""SELECT * FROM
                                     SolVideoProfile(%s,
                                                  %s, %s, %s,
@@ -254,7 +256,8 @@ class AvgVideoProfile(BaseProfile):
                  min_alt=10, min_eca_station=0.5,
                  gamma=DEFAULT_GAMMA,
                  popindex=DEFAULT_POPINDEX,
-                 label=None):
+                 label=None,
+                 marker='s'):
         """
 
         Parameters
@@ -311,6 +314,7 @@ class AvgVideoProfile(BaseProfile):
         else:
             #self.label = '{0} {1}'.format(shower, year)
             self.label = shower
+        self.marker = marker
         self.fluxes = self.fluxdb.query("""SELECT * FROM
                                     AvgVideoProfile(%s,
                                                  %s::int[], %s, %s,

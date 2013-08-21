@@ -20,8 +20,8 @@ Returns
 JSON objects with flux data and link to graph.
 """
 from flask import Flask, request, json
-from flux import db, profile, graph, util
 from astropy import log, time
+import db, profile, graph, util, config
 
 fluxapp = Flask('flux', static_url_path='')
 
@@ -69,7 +69,7 @@ def flux():
             sollon_start = util.sollon(start.datetime)
             sollon_stop = util.sollon(stop.datetime)
             profiles = []
-            for myyear in years:
+            for i, myyear in enumerate(years):
                 profiles.append(profile.AvgVideoProfile(mydb, 
                                            shower, [myyear],
                                            sollon_start, sollon_stop,
@@ -79,7 +79,8 @@ def flux():
                                            min_eca=min_eca,
                                            min_alt=min_alt,
                                            gamma=gamma,
-                                           popindex=popindex))
+                                           popindex=popindex,
+                                           marker=config.MARKERS[i]))
             mygraph = graph.SolVideoGraph(profiles)
             mygraph.plot()
             reponse = {}
