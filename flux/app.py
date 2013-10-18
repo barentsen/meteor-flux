@@ -51,6 +51,7 @@ def flux():
         min_alt = request.args.get('min_alt', default=10, type=float)
         gamma = request.args.get('gamma', default=1.5, type=float)
         popindex = request.args.get('popindex', default=2.0, type=float)
+        ymax = request.args.get('ymax', default=None, type=float)
         
         mydb = db.FluxDB()
 
@@ -63,7 +64,8 @@ def flux():
                                            min_eca=min_eca,
                                            min_alt=min_alt,
                                            gamma=gamma,
-                                           popindex=popindex)
+                                           popindex=popindex,
+                                           ymax=ymax)
             reponse = myprofile.get_response()
         elif avg == 'false' and len(years) > 1:
             sollon_start = util.sollon(start.datetime)
@@ -80,6 +82,7 @@ def flux():
                                            min_alt=min_alt,
                                            gamma=gamma,
                                            popindex=popindex,
+                                           ymax=ymax,
                                            marker=config.MARKERS[i]))
             mygraph = graph.SolVideoGraph(profiles)
             mygraph.plot()
@@ -99,7 +102,8 @@ def flux():
                                            min_eca=min_eca,
                                            min_alt=min_alt,
                                            gamma=gamma,
-                                           popindex=popindex)
+                                           popindex=popindex,
+                                           ymax=ymax)
             reponse = myprofile.get_response()
         else:
             raise ValueError('Inconsistent parameters')
