@@ -84,7 +84,7 @@ def flux():
                                            popindex=popindex,
                                            ymax=ymax,
                                            marker=config.MARKERS[i]))
-            mygraph = graph.SolVideoGraph(profiles)
+            mygraph = graph.SolVideoGraph(profiles, ymax=ymax)
             mygraph.plot()
             reponse = {}
             reponse['status'] = 'OK'
