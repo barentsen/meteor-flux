@@ -24,8 +24,9 @@ DEFAULT_POPINDEX = 2.2     # population index
 class BaseProfile(object):
     """Abstract base class."""
 
-    def __init__(self, fluxdb):
+    def __init__(self, fluxdb, ymax=None):
         self.fluxdb = fluxdb
+        self.ymax = ymax
 
     def field(self, key):
         """Returns a data field"""
@@ -77,7 +78,8 @@ class VideoProfile(BaseProfile):
                  min_eca=DEFAULT_MIN_ECA, 
                  min_alt=10, min_eca_station=0.5,
                  gamma=DEFAULT_GAMMA,
-                 popindex=DEFAULT_POPINDEX):
+                 popindex=DEFAULT_POPINDEX,
+                 ymax=None):
         """
 
         Parameters
@@ -117,7 +119,7 @@ class VideoProfile(BaseProfile):
         -------
         Result of the query.
         """
-        BaseProfile.__init__(self, fluxdb)
+        BaseProfile.__init__(self, fluxdb, ymax=ymax)
 
         if isinstance(start, Time):
             self.start = start
@@ -149,7 +151,7 @@ class VideoProfile(BaseProfile):
 
 
     def graph(self):
-        mygraph = graph.VideoGraph(self)
+        mygraph = graph.VideoGraph(self, ymax=self.ymax)
         mygraph.plot()
         return mygraph
 
@@ -167,6 +169,7 @@ class SolVideoProfile(BaseProfile):
                  min_alt=10, min_eca_station=0.5,
                  gamma=DEFAULT_GAMMA,
                  popindex=DEFAULT_POPINDEX,
+                 ymax=None,
                  label=None,
                  marker='s'):
         """
@@ -211,7 +214,7 @@ class SolVideoProfile(BaseProfile):
         -------
         Result of the query.
         """
-        BaseProfile.__init__(self, fluxdb)
+        BaseProfile.__init__(self, fluxdb, ymax=ymax)
         self.shower = shower
         self.year = year
         self.start = start
@@ -239,7 +242,7 @@ class SolVideoProfile(BaseProfile):
 
 
     def graph(self):
-        mygraph = graph.SolVideoGraph(self)
+        mygraph = graph.SolVideoGraph(self ymax=self.ymax)
         mygraph.plot()
         return mygraph
 
@@ -256,6 +259,7 @@ class AvgVideoProfile(BaseProfile):
                  min_alt=10, min_eca_station=0.5,
                  gamma=DEFAULT_GAMMA,
                  popindex=DEFAULT_POPINDEX,
+                 ymax=None,
                  label=None,
                  marker='s'):
         """
@@ -300,7 +304,7 @@ class AvgVideoProfile(BaseProfile):
         -------
         Result of the query.
         """
-        BaseProfile.__init__(self, fluxdb)
+        BaseProfile.__init__(self, fluxdb, ymax=ymax)
         self.shower = shower
         self.years = years
         self.start = start
@@ -330,6 +334,6 @@ class AvgVideoProfile(BaseProfile):
 
 
     def graph(self):
-        mygraph = graph.SolVideoGraph(self)
+        mygraph = graph.SolVideoGraph(self, ymax=self.ymax)
         mygraph.plot()
         return mygraph
