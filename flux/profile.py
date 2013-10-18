@@ -242,7 +242,7 @@ class SolVideoProfile(BaseProfile):
 
 
     def graph(self):
-        mygraph = graph.SolVideoGraph(self ymax=self.ymax)
+        mygraph = graph.SolVideoGraph(self, ymax=self.ymax)
         mygraph.plot()
         return mygraph
 
