@@ -29,9 +29,8 @@ class FluxDB(object):
         autocommit : boolean
             If true, changes will be commited on each operation.
         """
-        self.conn = psycopg2.connect(dbinfo,
-                                     cursor_factory=psycopg2.extras.DictCursor)
-        self.cur = self.conn.cursor()
+        self.conn = psycopg2.connect(dbinfo)
+        self.cur = self.conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
         self.prefix = prefix
         self.autocommit = autocommit
 

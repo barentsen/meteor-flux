@@ -17,6 +17,11 @@ elif HOSTNAME == 'flux':  # testing machine
     DBINFO = 'dbname=fluxdb user=postgres'
     TMPDIR = '/mnt/fluxtmp'
     TMPDIR_WWW = '/tmp'
+elif HOSTNAME == 'hal':
+    DEBUG = True
+    DBINFO = 'host=/var/run/postgresql dbname=fluxdb user=postgres'
+    TMPDIR = '/var/www/tmp'
+    TMPDIR_WWW = '/tmp'
 else:
     DEBUG = False
     DBINFO = 'host=flux.geert.io dbname=fluxdb user=postgres'
