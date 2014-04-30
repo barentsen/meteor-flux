@@ -20,3 +20,9 @@ Created by Geert Barentsen with help from Sirko Molau.
 License
 -------
 Released under MIT License, full details in `LICENSE` file.
+
+
+Dependencies
+------------
+* astropy
+* psycopg2

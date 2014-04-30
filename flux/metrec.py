@@ -70,6 +70,13 @@ class MetRecData(object):
                 elif fields[0] == "IMO" and fields[1] == "Code":
                     showercode = fields[2]
 
+        # We need to deal with the fact that two extra columns
+        # have been added in file format FLX v1.1
+        if fileformat == 'MetRec_FLX_1.0':
+            eca_idx, met_idx, mag_idx = 9, 10, 11
+        else:
+            eca_idx, met_idx, mag_idx = 11, 12, 13
+
         # Check all lines for flux data
         starthour = None
         for l in flx_data.splitlines():
@@ -86,7 +93,7 @@ class MetRecData(object):
                         mytime = mytime + datetime.timedelta(1)
                     # Missing values are indicated by dashes
                     is_valid = True
-                    for index in [1,2,3,4,6,7,8,9,10]:
+                    for index in [1, 2, 3, 4, 6, 7, 8, eca_idx, met_idx]:
                         if fields[index] == "-" or fields[index].find("--") > -1:
                             # fields[index] = None
                             is_valid = False
@@ -97,14 +104,6 @@ class MetRecData(object):
                         dist = None
                     else:
                         dist = fields[5]
-
-
-                    # Two extra columns have been added in file format FLX v1.1
-                    if fileformat == 'MetRec_FLX_1.0':
-                        eca_idx, met_idx, mag_idx = 9, 10, 11
-                    else:
-                        eca_idx, met_idx, mag_idx = 11, 12, 13
-
 
                     if is_valid:
                         row = { "dataset_id": self.dataset_id, 
