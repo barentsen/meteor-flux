@@ -8,6 +8,7 @@
 		{code:"LYR", r:"2.1", begin:"04/16", end:"04/25", max:"04/22", name:"Lyrids             "},
 		{code:"PPU", r:"2.0", begin:"04/15", end:"04/28", max:"04/24", name:"pi-Puppids         "},
 		{code:"ETA", r:"2.4", begin:"04/19", end:"05/28", max:"05/05", name:"eta-Aquarids       "},
+		{code:"CAM", r:"2.0", begin:"05/20", end:"05/28", max:"05/24", name:"Camelopardalids    "},
 		{code:"ELY", r:"3.0", begin:"05/03", end:"05/12", max:"05/09", name:"eta-Lyrids         "},
 		{code:"JBO", r:"2.2", begin:"06/22", end:"07/02", max:"06/27", name:"June-Bootids       "},
 		{code:"PAU", r:"3.2", begin:"07/15", end:"08/10", max:"07/28", name:"Piscis-Austrinids  "},
