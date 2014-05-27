@@ -24,9 +24,12 @@ elif HOSTNAME == 'hal':
     TMPDIR_WWW = '/tmp'
 else:
     DEBUG = False
-    DBINFO = 'host=flux.geert.io dbname=fluxdb user=postgres'
+    DBINFO = 'host=/var/run/postgresql dbname=fluxdb user=postgres'
     TMPDIR = '/tmp'
     TMPDIR_WWW = '/tmp'
 
+
+# Database to use for unit tests
+DBINFO_TESTING = 'host=/var/run/postgresql dbname=testdb user=postgres'
 DPI = 80  # Default DPI of graphs
 MARKERS = ['s', '^', 'o', 's', '^', 'o', 's', '^', 'o', 's', '^', 'o']

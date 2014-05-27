@@ -62,13 +62,20 @@ class MetRecData(object):
             fields = l.split()
             if len(fields) > 0:
                 if fields[0] == "Format":
-                    format = "_".join(fields[1:])
+                    fileformat = "_".join(fields[1:])
                 elif fields[0] == "Date":
                     year = int(fields[1][0:4])
                     month = int(fields[1][4:6])
                     day = int(fields[1][6:8])
                 elif fields[0] == "IMO" and fields[1] == "Code":
                     showercode = fields[2]
+
+        # We need to deal with the fact that two extra columns
+        # have been added in file format FLX v1.1
+        if fileformat == 'MetRec_FLX_1.0':
+            eca_idx, met_idx, mag_idx = 9, 10, 11
+        else:
+            eca_idx, met_idx, mag_idx = 11, 12, 13
 
         # Check all lines for flux data
         starthour = None
@@ -86,7 +93,7 @@ class MetRecData(object):
                         mytime = mytime + datetime.timedelta(1)
                     # Missing values are indicated by dashes
                     is_valid = True
-                    for index in [1,2,3,4,6,7,8,9,10]:
+                    for index in [1, 2, 3, 4, 6, 7, 8, eca_idx, met_idx]:
                         if fields[index] == "-" or fields[index].find("--") > -1:
                             # fields[index] = None
                             is_valid = False
@@ -98,10 +105,9 @@ class MetRecData(object):
                     else:
                         dist = fields[5]
 
-
                     if is_valid:
                         row = { "dataset_id": self.dataset_id, 
-                                "format": format,
+                                "format": fileformat,
                                 "station": self.station, 
                                 "shower": showercode, 
                                 "time": mytime,
@@ -113,9 +119,9 @@ class MetRecData(object):
                                 "vel": float(fields[6]), 
                                 "mlalt": float(fields[7]), 
                                 "lmmet": float(fields[8]), 
-                                "eca": float(fields[9]), 
-                                "met": int(fields[10]),
-                                "mag": [float(m) for m in fields[11:]],
+                                "eca": float(fields[eca_idx]), 
+                                "met": int(fields[met_idx]),
+                                "mag": [float(m) for m in fields[mag_idx:]],
                                 "added": str(datetime.datetime.now()) }
                         out.append(row)
         return out 
