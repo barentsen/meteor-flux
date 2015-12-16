@@ -80,6 +80,7 @@
                     <option value="ETA">ETA - eta-Aquarids (5/5)</option>
                     <option value="ELY">ELY - eta-Lyrids (5/9)</option>
                     <option value="CAM">CAM - Camelopardalids (5/24)</option>
+                    <option value="ARI">ARI - Daytime Arietids (6/07)</option>
                     <option value="JBO">JBO - June-Bootids (6/27)</option>
                   </optgroup>
                   <optgroup label="July - August">
@@ -92,10 +93,13 @@
                   <optgroup label="September - October">
                     <option value="AUR">AUR - alpha-Aurigids (9/1)</option>
                     <option value="SPE">SPE - September-Perseids (9/9)</option>
+                    <option value="CCY">CCY - chi-Cygnids (9/10-17)</option>
+                    <option value="KCE">KCE - kappa-Cepheids (9/11-23)</option>
+                    <option value="DSX">DSX - Sextantids (9/27)</option>
                     <option value="DAU">DAU - delta-Aurigids (10/4)</option>
-                    <option value="OCA">OCA - Oct-Camelopardalids (10/6)</option>
+                    <option value="OCT">OCT - Oct-Camelopardalids (10/6)</option>
                     <option value="GIA">GIA - Draconids (10/8)</option>
-                    <option value="TUM">TUM - tau-Ursa-Majorids (10/16)</option>
+                    <option value="OCU">OCU - October Ursae Majorids (10/16)</option>
                     <option value="EGE">EGE - epsilon-Geminids (10/18)</option>
                     <option value="ORI">ORI - Orionids (10/21)</option>
                     <option value="LMI">LMI - Leo-Minorids (10/24)</option>
@@ -141,8 +145,9 @@
             <div class="form-group ">
               <label for="year" class="col-lg-2 control-label">Year:</label>
               <div class="col-lg-2">
-                <select multiple id='year' class="form-control" >i
-                  <option selected="selected">2014</option>
+                <select multiple id='year' class="form-control" >
+                  <option selected="selected">2015</option>
+                  <option>2014</option>
                   <option>2013</option>
                   <option>2012</option>
                   <option>2011</option>
@@ -222,14 +227,14 @@
             <div class="form-group">
               <label for="gamma" class="col-lg-3 control-label">Gamma:</label>
               <div class="col-lg-8">
-                <input type='text' id='gamma' class="form-control" value='1.9' style='width:4em;' />
+                <input type='text' id='gamma' class="form-control" value='1.5' style='width:4em;' />
                 <span class="help-block">Zenith exponent.</span>
               </div>
             </div>
             <div class="form-group">
               <label for="min_alt" class="col-lg-3 control-label">Radiant alt.:</label>
               <div class="col-lg-8">
-                <input type='text' id='min_alt' class="form-control" value='20' style='width:4em;' />
+                <input type='text' id='min_alt' class="form-control" value='10' style='width:4em;' />
                 <span class="help-block">Minimum radiant elevation in degrees.</span>
               </div>
             </div>
