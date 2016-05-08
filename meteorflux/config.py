@@ -15,7 +15,7 @@ elif HOSTNAME == 'flux':  # testing machine
     DBINFO = 'dbname=fluxdb user=postgres'
     TMPDIR = '/mnt/fluxtmp'
     TMPDIR_WWW = '/tmp'
-elif HOSTNAME == 'hal' or HOSTNAME == 'imo.geert.io':
+elif HOSTNAME == 'ec.geert.io' or HOSTNAME == 'imo.geert.io' or HOSTNAME == 'meteorflux.io':
     DEBUG = True
     DBINFO = 'host=/var/run/postgresql dbname=fluxdb user=postgres'
     TMPDIR = '/var/www/tmp'
