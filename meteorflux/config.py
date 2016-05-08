@@ -1,6 +1,4 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-"""Constants used in the IPHAS Data Release modules."""
+"""Configuration constants."""
 import os
 
 PACKAGEDIR = os.path.dirname(os.path.abspath(__file__))
@@ -23,7 +21,7 @@ elif HOSTNAME == 'hal' or HOSTNAME == 'imo.geert.io':
     TMPDIR = '/var/www/tmp'
     TMPDIR_WWW = '/tmp'
 else:
-    DEBUG = False
+    DEBUG = True
     DBINFO = 'host=/var/run/postgresql dbname=fluxdb user=postgres'
     TMPDIR = '/tmp'
     TMPDIR_WWW = '/tmp'

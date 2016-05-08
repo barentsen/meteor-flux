@@ -5,18 +5,18 @@ import numpy as np
 import matplotlib as mpl
 mpl.use('Agg')  # Avoid needing X
 import matplotlib.pyplot as plt
+from cycler import cycler
 import datetime
 import tempfile
 from astropy import log
 from astropy.time import Time
 import os
 
-import config
-import util
+from . import config, util
 
 params = {'backend': 'Agg',
           'axes.labelsize': 18,
-          'text.fontsize': 16,
+          'font.size': 16,
           'legend.fontsize': 16,
           'xtick.labelsize': 14,
           'xtick.major.size': 8,
@@ -26,7 +26,7 @@ params = {'backend': 'Agg',
 plt.rcParams.update(params)
 #plt.rcParams['axes.facecolor'] = 'F0F0F0'
 #plt.rcParams['axes.edgecolor'] = 'E7E7E7'
-plt.rcParams['axes.color_cycle'] = ['C5000B', '0084D1', '008000', 'FFD320']
+plt.rcParams['axes.prop_cycle'] = cycler('color', ['C5000B', '0084D1', '008000', 'FFD320'])
 
 
 class BaseGraph(object):

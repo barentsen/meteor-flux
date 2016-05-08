@@ -1,6 +1,4 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-"""Flask app.
+"""Flask app to graph video meteor fluxes.
 
 API end-points:
 
@@ -20,10 +18,11 @@ Returns
 JSON objects with flux data and link to graph.
 """
 from flask import Flask, request, json
-from astropy import log, time
-import db, profile, graph, util, config
+from astropy import time
 
-fluxapp = Flask('flux', static_url_path='')
+from . import db, profile, graph, util, config
+
+fluxapp = Flask('meteorflux', static_url_path='')
 
 @fluxapp.route('/')
 def root():
@@ -109,7 +108,7 @@ def flux():
             raise ValueError('Inconsistent parameters')
 
         return json.jsonify(reponse)
-    except ValueError, e:
+    except ValueError as e:
         reponse = {'status':'ERROR',
                    'msg':'Invalid parameters.',
                    'debug':str(e)}

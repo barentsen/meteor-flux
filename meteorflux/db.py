@@ -1,23 +1,23 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-"""
-Flux database.
-
+"""Flux database.
 """
 import os
 import psycopg2
 import psycopg2.extras
-from StringIO import StringIO
 from astropy import log
 
-import config
+try:
+    from StringIO import StringIO  # Python 2
+except ImportError:
+    from io import StringIO
+
+from . import config
 
 
 class FluxDB(object):
 
     def __init__(self,
                  dbinfo=config.DBINFO,
-                 prefix='', 
+                 prefix='',
                  autocommit=True):
         """Constructor
 
@@ -199,5 +199,4 @@ class FluxDB(object):
             sql = "".join(myfile.readlines())
             self.cur.execute(sql)
         if self.autocommit:
-            self.commit()        
-
+            self.commit()

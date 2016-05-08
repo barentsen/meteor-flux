@@ -6,8 +6,7 @@ from astropy import log
 from astropy.time import Time
 import copy
 
-import config
-import graph
+from . import config, graph
 
 ############
 # CONSTANTS

@@ -1,10 +1,8 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
 """Starts the Flask app in debug mode.
 
-Do not use in production.
+Do not ever use this script in production.
 """
-from flux.app import fluxapp
+from meteorflux import fluxapp
 
 if __name__ == "__main__":
     fluxapp.debug = True
