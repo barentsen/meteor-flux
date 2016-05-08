@@ -17,7 +17,7 @@ Returns
 -------
 JSON objects with flux data and link to graph.
 """
-from flask import Flask, request, json
+from flask import Flask, request, json, send_from_directory
 from astropy import time
 
 from . import db, profile, graph, util, config
@@ -27,6 +27,10 @@ fluxapp = Flask('meteorflux', static_url_path='')
 @fluxapp.route('/')
 def root():
     return fluxapp.send_static_file('index.html')
+
+@fluxapp.route('/tmp/<path:path>')
+def send_tmp(path):
+    return send_from_directory('/var/www/tmp', path)
 
 @fluxapp.route('/api/flux', methods=['GET'])
 @util.crossdomain(origin='*')
