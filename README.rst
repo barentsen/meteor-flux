@@ -24,5 +24,8 @@ Released under MIT License, full details in `LICENSE` file.
 
 Dependencies
 ------------
+* numpy
+* matplotlib
 * astropy
 * psycopg2
+* flask

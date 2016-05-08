@@ -10,7 +10,7 @@ import zipfile
 import datetime
 from astropy import log
 
-import db
+from . import db
 
 ##########
 # CLASSES
@@ -55,9 +55,10 @@ class MetRecData(object):
         """
         out = []
 
-        flx_data = self.zipfile.read(filename)
+        flx_data = self.zipfile.read(filename).decode("ISO-8859-1")
 
         # Check all lines for header data
+        fileformat = ""
         for l in flx_data.splitlines():
             fields = l.split()
             if len(fields) > 0:
