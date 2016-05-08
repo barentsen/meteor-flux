@@ -13,6 +13,7 @@ from . import config, graph
 ############
 DEFAULT_MIN_METEORS = 100  # meteors
 DEFAULT_MIN_ECA = 50000    # km^2 h
+DEFAULT_MIN_ECA_STATION = -0.1 # Was 0.05
 DEFAULT_GAMMA = 1.5
 DEFAULT_POPINDEX = 2.2     # population index
 
@@ -75,7 +76,8 @@ class VideoProfile(BaseProfile):
                  min_interval=1, max_interval=24,
                  min_meteors=DEFAULT_MIN_METEORS,
                  min_eca=DEFAULT_MIN_ECA, 
-                 min_alt=10, min_eca_station=0.5,
+                 min_alt=10,
+                 min_eca_station=DEFAULT_MIN_ECA_STATION,
                  gamma=DEFAULT_GAMMA,
                  popindex=DEFAULT_POPINDEX,
                  ymax=None):
@@ -165,7 +167,8 @@ class SolVideoProfile(BaseProfile):
                  min_interval=1, max_interval=24,
                  min_meteors=DEFAULT_MIN_METEORS,
                  min_eca=DEFAULT_MIN_ECA, 
-                 min_alt=10, min_eca_station=0.5,
+                 min_alt=10,
+                 min_eca_station=DEFAULT_MIN_ECA_STATION,
                  gamma=DEFAULT_GAMMA,
                  popindex=DEFAULT_POPINDEX,
                  ymax=None,
@@ -255,7 +258,8 @@ class AvgVideoProfile(BaseProfile):
                  min_interval=1, max_interval=24,
                  min_meteors=DEFAULT_MIN_METEORS,
                  min_eca=DEFAULT_MIN_ECA, 
-                 min_alt=10, min_eca_station=0.5,
+                 min_alt=10,
+                 min_eca_station=DEFAULT_MIN_ECA_STATION,
                  gamma=DEFAULT_GAMMA,
                  popindex=DEFAULT_POPINDEX,
                  ymax=None,

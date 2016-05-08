@@ -77,6 +77,22 @@ class BaseGraph(object):
         d = datetime.datetime.fromordinal(int(a))+datetime.timedelta(a-int(a))
         return fmt % util.sollon(d)
 
+    def solgraph_sollon_formatter(self, a, b):
+        """
+        a: sollon
+        b: tick nr 
+        Usage: ax.xaxis.set_major_formatter(pylab.FuncFormatter(sollon_formatter)) 
+        """
+        # 10 days
+        if self.timespan > 10:
+            fmt = "%.1f"
+        # 1 day
+        elif self.timespan > 1:
+            fmt = "%.2f"
+        else:
+            fmt = "%.3f"
+        return fmt % a
+
     def date_formatter(self, a, b):
         """
         a: ordinal datetime
@@ -259,7 +275,7 @@ class SolVideoGraph(BaseGraph):
         else:
             self.profiles = [profiles]       
 
-        self.timespan = (self.profiles[0].stop - self.profiles[0].start) # hours
+        self.timespan = (self.profiles[0].stop - self.profiles[0].start)
         self.ymax = ymax
 
     
@@ -290,7 +306,10 @@ class SolVideoGraph(BaseGraph):
                                                 self.profiles[0].popindex,
                                                 self.profiles[0].gamma))
         self.ax_zhr.yaxis.set_major_formatter(plt.FuncFormatter(self.zhr_formatter))
-                       
+        
+        # X axis as top for the solar longitude
+        self.ax.xaxis.set_major_formatter(plt.FuncFormatter(self.solgraph_sollon_formatter))
+
         self.ax.grid(which="both")
 
     def setup_limits(self):
