@@ -281,17 +281,20 @@ class SolVideoGraph(BaseGraph):
     
     def plot(self):
         self.setup_axes()
-
+        collections = []
+        labels = []
         for p in self.profiles:
-            self.ax.errorbar(p.field('solarlon'),
+            eb = self.ax.errorbar(p.field('solarlon'),
                              p.field('flux'),
                              yerr=p.field('e_flux'),
                              fmt=p.marker,
                              ms=4, lw=1.0,
-                             label=p.label)
-        
+                             label="{}".format(p.label))
+            collections.append(eb[0])
+            labels.append(p.label)
+
         if len(self.profiles) > 1:
-            self.ax.legend()
+            self.ax.legend(collections, labels)
 
         self.setup_limits()
         self.setup_labels()
