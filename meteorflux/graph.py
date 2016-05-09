@@ -26,7 +26,7 @@ params = {'backend': 'Agg',
 plt.rcParams.update(params)
 #plt.rcParams['axes.facecolor'] = 'F0F0F0'
 #plt.rcParams['axes.edgecolor'] = 'E7E7E7'
-plt.rcParams['axes.prop_cycle'] = cycler('color', ['C5000B', '0084D1', '008000', 'FFD320'])
+plt.rcParams['axes.prop_cycle'] = cycler('color', ['#C5000B', '#0084D1', '#008000', '#FFD320'])
 
 
 class BaseGraph(object):
