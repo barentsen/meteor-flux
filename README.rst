@@ -5,7 +5,7 @@ of meteor flux observations stored in a PostgreSQL database.
 
 Demo
 ----
-To see the app in action, visit `meteorflux.io <meteorflux.io>`_.
+To see the app in action, visit `http://meteorflux.io <http://meteorflux.io>`_.
 
 Usage
 -----
