@@ -5,22 +5,24 @@ of meteor flux observations stored in a PostgreSQL database.
 
 Demo
 ----
+To see the code in action, visit [meteorflux.io](meteorflux.io).
+
+Usage
+-----
 To run the app locally in debug mode, execute:
 
-    python scripts/service.py
+  python scripts/service.py
 
-To run the app in production, Apache must be configured 
-to serve `fluxapp.wsgi` through mod_wsgi.
+To run the app in production, see the `Flask` documentation for
+configuring Nginx or Apache.
 
 Authors
 -------
-Created by Geert Barentsen with help from Sirko Molau.
-
+Geert Barentsen, Sirko Molau.
 
 License
 -------
 Released under MIT License, full details in `LICENSE` file.
-
 
 Dependencies
 ------------
