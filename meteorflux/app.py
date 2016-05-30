@@ -24,13 +24,16 @@ from . import db, profile, graph, util, config
 
 fluxapp = Flask('meteorflux', static_url_path='')
 
+
 @fluxapp.route('/')
 def root():
     return fluxapp.send_static_file('index.html')
 
+
 @fluxapp.route('/tmp/<path:path>')
 def send_tmp(path):
     return send_from_directory('/var/www/tmp', path)
+
 
 @fluxapp.route('/api/flux', methods=['GET'])
 @util.crossdomain(origin='*')
@@ -55,7 +58,7 @@ def flux():
         gamma = request.args.get('gamma', default=1.5, type=float)
         popindex = request.args.get('popindex', default=2.0, type=float)
         ymax = request.args.get('ymax', default=None, type=float)
-        
+
         mydb = db.FluxDB()
 
         years = year.split(',')
@@ -75,7 +78,7 @@ def flux():
             sollon_stop = util.sollon(stop.datetime)
             profiles = []
             for i, myyear in enumerate(years):
-                profiles.append(profile.AvgVideoProfile(mydb, 
+                profiles.append(profile.AvgVideoProfile(mydb,
                                            shower, [myyear],
                                            sollon_start, sollon_stop,
                                            min_interval=min_interval,
@@ -96,7 +99,7 @@ def flux():
         elif avg == 'true':
             sollon_start = util.sollon(start.datetime)
             sollon_stop = util.sollon(stop.datetime)
-            myprofile = profile.AvgVideoProfile(mydb, 
+            myprofile = profile.AvgVideoProfile(mydb,
                                            shower, years,
                                            sollon_start, sollon_stop,
                                            min_interval=min_interval,
@@ -111,10 +114,11 @@ def flux():
         else:
             raise ValueError('Inconsistent parameters')
 
+        mydb.close()
         return json.jsonify(reponse)
     except ValueError as e:
         reponse = {'status':'ERROR',
                    'msg':'Invalid parameters.',
                    'debug':str(e)}
+        mydb.close()
         return json.jsonify(reponse)
-

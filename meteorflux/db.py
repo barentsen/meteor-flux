@@ -38,9 +38,12 @@ class FluxDB(object):
 
     def __del__(self):
         """Destructor"""
+        self.close()
+
+    def close(self):
+        """Close the database connection."""
         self.cur.close()
         self.conn.close()
-
 
     ################
     # DATA QUERYING
