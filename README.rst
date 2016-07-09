@@ -5,11 +5,11 @@ of meteor flux observations stored in a PostgreSQL database.
 
 Demo
 ----
-To see the code in action, visit [meteorflux.io](meteorflux.io).
+To see the app in action, visit `http://meteorflux.io <http://meteorflux.io>`_.
 
 Usage
 -----
-To run the app locally in debug mode, execute:
+To run the app locally in debug mode, execute::
 
   python scripts/service.py
 
