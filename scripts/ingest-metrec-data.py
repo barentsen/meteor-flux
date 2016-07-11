@@ -5,13 +5,12 @@
 """
 import os
 import sys
-sys.path.append("/home/gb/dev/meteor-flux")
 import zipfile
 import datetime
 from astropy import log
 
-from flux import metrec
-from flux import db
+from meteorflux import metrec
+from meteorflux import db
 
 #######
 # MAIN
