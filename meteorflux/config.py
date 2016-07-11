@@ -6,7 +6,7 @@ PACKAGEDIR = os.path.dirname(os.path.abspath(__file__))
 HOSTNAME = os.uname()[1]
 if HOSTNAME == 'ec.geert.io' or HOSTNAME == 'imo.geert.io' or HOSTNAME == 'meteorflux.io':
     DEBUG = True
-    DBINFO = 'host=/var/run/postgresql dbname=flux_kca user=postgres'
+    DBINFO = 'host=/var/run/postgresql dbname=fluxdb user=postgres'
     TMPDIR = '/var/www/tmp'
     TMPDIR_WWW = '/tmp'
 else:
