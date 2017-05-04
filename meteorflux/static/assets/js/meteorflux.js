@@ -1,6 +1,7 @@
 	debug = function (msg) { if (window.console != undefined) { console.log(msg); } }
 	
 	var showers = [
+		{code:"GDR", r:"3.0", begin:"07/24", end:"07/30", max:"07/27", name:"July Gamma Draconids"},
 		{code:"QUA", r:"2.1", begin:"01/01", end:"01/05", max:"01/03", name:"Quadrantids        "},
 		{code:"ACE", r:"2.0", begin:"01/28", end:"02/21", max:"02/07", name:"alpha-Centaurids   "},			
 		{code:"DLE", r:"3.0", begin:"02/15", end:"03/10", max:"02/24", name:"delta-Leonids      "},
@@ -31,7 +32,8 @@
 		{code:"NTA", r:"2.3", begin:"09/25", end:"11/25", max:"11/12", name:"N-Taurids          "},
 		{code:"LEO", r:"2.5", begin:"11/10", end:"11/23", max:"11/17", name:"Leonids            "},
 		{code:"AMO", r:"2.4", begin:"11/15", end:"11/25", max:"11/21", name:"alpha-Monocerotids "},
-		{code:"PHO", r:"2.8", begin:"11/28", end:"12/09", max:"12/06", name:"December-Phoenicids"},
+		{code:"NOO", r:"2.0", begin:"11/14", end:"12/06", max:"11/15", name:"November Orionids"},
+        {code:"PHO", r:"2.8", begin:"11/28", end:"12/09", max:"12/06", name:"December-Phoenicids"},
 		{code:"PUP", r:"2.9", begin:"12/01", end:"12/15", max:"12/07", name:"Puppid-Velids      "},
 		{code:"MON", r:"3.0", begin:"11/27", end:"12/17", max:"12/09", name:"Monocerotids       "},
 		{code:"HYD", r:"3.0", begin:"12/03", end:"12/15", max:"12/12", name:"sigma-Hydrids      "},
